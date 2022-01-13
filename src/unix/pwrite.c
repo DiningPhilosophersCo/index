@@ -16,9 +16,15 @@ CAMLprim value caml_index_pwrite_int
   size_t len = Long_val(v_len);
 
   size_t numbytes = (len > UNIX_BUFFER_SIZE) ? UNIX_BUFFER_SIZE : len;
+#if defined(WIN32) || defined(_WIN32)
+  HANDLE fh = _get_osfhandle(fd);
+  if (!WriteFile(fh, &Byte(v_buf, buf_off), numbytes, &ret, NULL)) {
+    uerror("write", Nothing);
+  }
+#else
   ret = pwrite(fd, &Byte(v_buf, buf_off), numbytes, fd_off);
-
   if (ret == -1) uerror("write", Nothing);
+#endif
 
   CAMLreturn(Val_long(ret));
 }
@@ -35,9 +41,15 @@ CAMLprim value caml_index_pwrite_int64
   size_t len = Long_val(v_len);
 
   size_t numbytes = (len > UNIX_BUFFER_SIZE) ? UNIX_BUFFER_SIZE : len;
+#if defined(WIN32) || defined(_WIN32)
+  HANDLE fh = _get_osfhandle(fd);
+  if (!WriteFile(fh, &Byte(v_buf, buf_off), numbytes, &ret, NULL)) {
+    uerror("write", Nothing);
+  }
+#else
   ret = pwrite(fd, &Byte(v_buf, buf_off), numbytes, fd_off);
-
   if (ret == -1) uerror("write", Nothing);
+#endif
 
   CAMLreturn(Val_long(ret));
 }
